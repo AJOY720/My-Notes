@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3157d5">
+  <meta name="description" content="My Note Pad — বাংলা ও English নোট অ্যাপ">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./styles.css">
+  <title>My Note Pad</title>
+</head>
+<body>
+  <div id="lockScreen" class="lock-screen hidden">
+    <form id="unlockForm" class="lock-card">
+      <div class="brand-icon">✎</div>
+      <h1 data-i18n="appName">My Note Pad</h1>
+      <p data-i18n="enterPin">অ্যাপ খুলতে PIN দিন</p>
+      <input id="unlockPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="current-password" placeholder="PIN" required>
+      <button class="primary" type="submit" data-i18n="unlock">Unlock</button>
+      <p id="unlockError" class="error" role="alert"></p>
+    </form>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">✎</div>
+      <div><h1 data-i18n="appName">My Note Pad</h1><small id="saveStatus" data-i18n="localReady">লোকাল সেভ চালু</small></div>
+    </div>
+    <div class="top-actions">
+      <button id="languageBtn" class="icon-btn" aria-label="Change language">বাংলা</button>
+      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">☾</button>
+      <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="toolbar">
+      <input id="searchInput" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="নোট খুঁজুন..." aria-label="Search notes">
+      <button id="newNoteBtn" class="primary">＋ <span data-i18n="newNote">নতুন নোট</span></button>
+    </section>
+    <nav class="tabs" aria-label="Note filters">
+      <button class="tab active" data-filter="all" data-i18n="allNotes">সব নোট</button>
+      <button class="tab" data-filter="pinned" data-i18n="pinned">পিন</button>
+      <button class="tab" data-filter="favorites" data-i18n="favorites">প্রিয়</button>
+      <button class="tab" data-filter="trash" data-i18n="trash">Trash</button>
+    </nav>
+
+    <section id="editor" class="editor hidden" aria-label="Note editor">
+      <div class="editor-heading">
+        <h2 id="editorHeading" data-i18n="newNote">নতুন নোট</h2>
+        <button id="closeEditorBtn" class="icon-btn" aria-label="Close editor">✕</button>
+      </div>
+      <input id="noteTitle" maxlength="180" data-i18n-placeholder="titlePlaceholder" placeholder="নোটের শিরোনাম">
+      <textarea id="noteBody" rows="10" data-i18n-placeholder="bodyPlaceholder" placeholder="এখানে লিখুন..."></textarea>
+      <div class="editor-meta"><span id="editorSaveState" data-i18n="autoSave">স্বয়ংক্রিয়ভাবে সেভ হবে</span><span id="editorDate"></span></div>
+      <div class="editor-actions">
+        <button id="pinBtn" class="secondary">📌 <span data-i18n="pin">Pin</span></button>
+        <button id="favoriteBtn" class="secondary">☆ <span data-i18n="favorite">প্রিয়</span></button>
+        <button id="shareBtn" class="secondary" data-i18n="share">Share</button>
+        <button id="deleteBtn" class="danger" data-i18n="delete">Delete</button>
+      </div>
+    </section>
+
+    <section id="notesList" class="notes-grid" aria-live="polite"></section>
+    <div id="emptyState" class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h2 data-i18n="noNotes">এখনও কোনো নোট নেই</h2>
+      <p data-i18n="emptyHint">নতুন নোট তৈরি করতে “নতুন নোট” চাপুন।</p>
+    </div>
+
+    <section id="settingsPanel" class="settings-panel hidden">
+      <div class="editor-heading"><h2 data-i18n="settings">সেটিংস</h2><button id="closeSettingsBtn" class="icon-btn">✕</button></div>
+      <h3 data-i18n="security">নিরাপত্তা</h3>
+      <div class="button-row">
+        <button id="setPinBtn" class="secondary" data-i18n="setPin">PIN সেট / পরিবর্তন</button>
+        <button id="removePinBtn" class="secondary" data-i18n="removePin">PIN বন্ধ</button>
+      </div>
+      <h3 data-i18n="backup">Backup & Restore</h3>
+      <div class="button-row">
+        <button id="exportBtn" class="secondary" data-i18n="exportBackup">Backup ডাউনলোড</button>
+        <label class="file-button secondary"><span data-i18n="importBackup">Backup Restore</span><input id="importFile" type="file" accept=".json,application/json"></label>
+      </div>
+      <h3 data-i18n="cloudSync">Online Sync (Firebase)</h3>
+      <p class="muted" data-i18n="syncHint">একই ইমেইল দিয়ে সাইন ইন করলে এই অ্যাকাউন্টের নোট ক্লাউডে সিঙ্ক হবে। Firebase সেটআপ দরকার।</p>
+      <form id="authForm" class="auth-form">
+        <input id="emailInput" type="email" placeholder="Email" autocomplete="email" required>
+        <input id="passwordInput" type="password" placeholder="Password (কমপক্ষে 6 অক্ষর)" minlength="6" autocomplete="current-password" required>
+        <div class="button-row">
+          <button id="signInBtn" class="primary" type="button" data-i18n="signIn">Sign in</button>
+          <button id="signUpBtn" class="secondary" type="button" data-i18n="signUp">Create account</button>
+          <button id="signOutBtn" class="danger hidden" type="button" data-i18n="signOut">Sign out</button>
+        </div>
+      </form>
+      <p id="syncStatus" class="status-message" role="status"></p>
+      <div class="button-row"><button id="syncNowBtn" class="secondary" data-i18n="syncNow">এখন Sync করুন</button></div>
+      <p class="warning" data-i18n="securityWarning">গুরুত্বপূর্ণ: PIN লক সাধারণ অ্যাপ-লক, এটি ডিভাইসের এনক্রিপশনের বিকল্প নয়। সংবেদনশীল তথ্যের জন্য ফোনের স্ক্রিন লক ব্যবহার করুন।</p>
+    </section>
+  </main>
+  <footer><span data-i18n="offlineReady">Offline Ready</span> · <span id="noteCount">0</span> <span data-i18n="notes">নোট</span></footer>
+
+  <dialog id="pinDialog">
+    <form id="pinForm" method="dialog" class="dialog-card">
+      <h2 data-i18n="pinSettings">PIN সেটিংস</h2>
+      <p id="pinDialogMessage" data-i18n="choosePin">৪–১২ সংখ্যার PIN দিন</p>
+      <input id="newPinInput" type="password" inputmode="numeric" pattern="[0-9]{4,12}" minlength="4" maxlength="12" placeholder="New PIN" required>
+      <input id="confirmPinInput" type="password" inputmode="numeric" pattern="[0-9]{4,12}" minlength="4" maxlength="12" placeholder="Confirm PIN" required>
+      <div class="button-row"><button id="cancelPinBtn" class="secondary" type="button" data-i18n="cancel">বাতিল</button><button class="primary" type="submit" data-i18n="savePin">PIN সেভ</button></div>
+      <p id="pinDialogError" class="error"></p>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- Firebase compat SDK: used only after Firebase config is added in firebase-config.js -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="./firebase-config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
